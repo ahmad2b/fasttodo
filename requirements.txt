@@ -5,3 +5,6 @@ SQLAlchemy==2.0.25
 alembic
 setuptools
 psycopg2-binary
+python-jose 
+passlib
+bcrypt

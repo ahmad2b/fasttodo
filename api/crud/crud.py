@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 
-from ..models.models import Todo
-from ..schemas.schemas import TodoCreate
+from ..models.models import Todo, User
+from ..schemas.schemas import TodoCreate, UserCreate
+from ..lib import auth
 
 
 def create_todo(db: Session, todo: TodoCreate):
@@ -48,3 +49,22 @@ def delete_todo(db: Session, todo_id: int):
     db.query(Todo).filter(Todo.id == todo_id).delete()
     db.commit()
     return True
+
+
+def create_user(db: Session, user: UserCreate):
+    hashed_password = auth.get_password_hash(user.password)
+    db_user = User(
+        username=user.username, email=user.email, hashed_password=hashed_password
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
+def get_user(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()
+
+
+def get_user_by_email(db: Session, email: str):
+    return db.query(User).filter(User.email == email).first()

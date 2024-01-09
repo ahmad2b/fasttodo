@@ -1,17 +1,44 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Body
 from fastapi.responses import JSONResponse, PlainTextResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing import Union, List
 from functools import lru_cache
 from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
 
-from .lib.db import get_db
+from .lib.db import get_db, SessionLocal
+from .lib.auth import (
+    authenticate_user,
+    create_access_token,
+    get_current_user,
+    verify_password,
+)
 from .config import config
-from .schemas.schemas import TodoCreate, TodoResponse
-from .crud.crud import create_todo, get_todos, delete_todo, update_todo, read_todo
+from .schemas.schemas import (
+    TodoCreate,
+    TodoResponse,
+    UserResponse,
+    UserCreate,
+    TokenData,
+    Token,
+    UserLogin,
+)
+from .crud.crud import (
+    create_todo,
+    get_todos,
+    delete_todo,
+    update_todo,
+    read_todo,
+    get_user,
+    create_user,
+)
 
 app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json")
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 origins = [
     "http://localhost:3000",
@@ -46,6 +73,53 @@ def read_root(settings: config.Settings = Depends(get_settings)):
 @app.get("/api/status")
 def hello():
     return {"status": "success", "message": "Hello Friends!"}
+
+
+@app.post(
+    "/api/auth/signup",
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
+    db_user = get_user(db, username=user.username)
+
+    if db_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    return create_user(db=db, user=user)
+
+
+@app.post("/api/auth/login", response_model=Token)
+def login(
+    user: UserLogin,
+    db: Session = Depends(get_db),
+):
+    """
+    Login route. Returns a JWT token to be used in subsequent requests.
+    """
+    db_user = get_user(db, username=user.username)
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    if not verify_password(user.password, db_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    access_token_expires = timedelta(minutes=30)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "username": user.username,
+    }
+
+
+@app.get("/api/auth/me", response_model=UserResponse)
+async def read_users_me(
+    current_user: UserResponse = Depends(get_current_user),
+):
+    """
+    Get the login user information.
+    """
+    return current_user
 
 
 @app.post(

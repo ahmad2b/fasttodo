@@ -27,6 +27,11 @@ class UserCreate(BaseModel):
     password: str
 
 
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
 class UserResponse(BaseModel):
     id: int
     username: str
@@ -37,3 +42,12 @@ class UserResponse(BaseModel):
 
     class ConfigDict:
         orm_mode = True
+
+
+class TokenData(BaseModel):
+    sub: Optional[str] = None
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
