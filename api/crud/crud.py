@@ -1,28 +1,61 @@
 from sqlalchemy.orm import Session
+from typing import Optional
 
 from ..models.models import Todo, User
 from ..schemas.schemas import TodoCreate, UserCreate
 from ..lib import auth
 
 
-def create_todo(db: Session, todo: TodoCreate):
-    db_todo = Todo(title=todo.title, description=todo.description)
+def create_todo(db: Session, todo: TodoCreate, owner_id: int):
+    db_todo = Todo(title=todo.title, description=todo.description, owner_id=owner_id)
     db.add(db_todo)
     db.commit()
     db.refresh(db_todo)
     return db_todo
 
 
-def get_todos(db: Session, skip: int = 0, limit: int = 100, completed: bool = False):
-    if completed:
+def get_todos(
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+    completed: bool = False,
+    owner_id: Optional[int] = None,
+):
+    if owner_id:
         return (
             db.query(Todo)
+            .filter(Todo.owner_id == owner_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+    return (
+        db.query(Todo)
+        .filter(Todo.completed == completed)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+    if owner_id and completed:
+        return (
+            db.query(Todo)
+            .filter(Todo.owner_id == owner_id)
             .filter(Todo.completed == completed)
             .offset(skip)
             .limit(limit)
             .all()
         )
-    return db.query(Todo).offset(skip).limit(limit).all()
+
+    # if completed:
+    #     return (
+    #         db.query(Todo)
+    #         .filter(Todo.completed == completed)
+    #         .offset(skip)
+    #         .limit(limit)
+    #         .all()
+    #     )
+    # return db.query(Todo).offset(skip).limit(limit).all()
 
 
 def read_todo(db: Session, todo_id: int):

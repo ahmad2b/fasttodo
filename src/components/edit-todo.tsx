@@ -3,10 +3,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
-	DialogClose,
 	DialogContent,
 	DialogDescription,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
@@ -31,10 +29,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
+import { revalidatePath } from 'next/cache';
 
 export const EditTodo = ({ row }: { row: Row<Todo> }) => {
 	const router = useRouter();
-	const [open, setOpen] = useState(false); // create a state for the dialog
+	const [open, setOpen] = useState(false);
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	const form = useForm<TodoRequest>({
 		resolver: zodResolver(TodoValidator),
@@ -48,16 +48,13 @@ export const EditTodo = ({ row }: { row: Row<Todo> }) => {
 	const onSubmit = async (data: TodoRequest) => {
 		try {
 			const parsedData = TodoValidator.parse(data);
-			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_API_URL}/todos/${row.original.id}`,
-				{
-					method: 'PUT',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(parsedData),
-				}
-			);
+			const response = await fetch(`/fast/todo/${row.original.id}`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(parsedData),
+			});
 
 			const json = await response.json();
 
@@ -80,6 +77,7 @@ export const EditTodo = ({ row }: { row: Row<Todo> }) => {
 
 	const handleDelete = async (id: number) => {
 		try {
+			setIsDeleting(true);
 			const response = await fetch(
 				`${process.env.NEXT_PUBLIC_API_URL}/todos/${id}`,
 				{
@@ -101,9 +99,15 @@ export const EditTodo = ({ row }: { row: Row<Todo> }) => {
 			toast('Todo deleted successfuly', {
 				description: row.original.title,
 			});
-		} catch (error) {}
+
+			router.refresh();
+		} catch (error) {
+		} finally {
+			setIsDeleting(false);
+		}
 		form.reset();
 		router.refresh();
+		router.push('/');
 		setOpen(false);
 	};
 
@@ -172,23 +176,23 @@ export const EditTodo = ({ row }: { row: Row<Todo> }) => {
 									form.formState.isSubmitting || !form.formState.isValid
 								}
 								className='w-full'
+								isLoading={form.formState.isSubmitting}
 							>
 								Update Todo
 							</Button>
 						</form>
 					</Form>
 				</div>
-				{/* <DialogFooter className='sm:justify-start'> */}
 				<Button
 					type='button'
 					variant='destructive'
 					className='w-full'
 					onClick={() => handleDelete(row.original.id)}
 					disabled={form.formState.isSubmitting}
+					isLoading={isDeleting}
 				>
 					Delete Todo
 				</Button>
-				{/* </DialogFooter> */}
 			</DialogContent>
 		</Dialog>
 	);

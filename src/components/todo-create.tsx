@@ -18,6 +18,7 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { useState } from 'react';
+import { revalidatePath } from 'next/cache';
 
 export const TodoValidator = z.object({
 	title: z.string().min(1).max(100),
@@ -44,7 +45,7 @@ export const ToDoCreate = () => {
 		try {
 			setIsLoading(true);
 			const parsedData = TodoValidator.parse(data);
-			const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/todos`, {
+			const response = await fetch(`/fast/todo`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -52,7 +53,16 @@ export const ToDoCreate = () => {
 				body: JSON.stringify(parsedData),
 			});
 
+			if (response.status === 401) {
+				toast('Please login or create account to create todos', {
+					description: 'Unauthorized',
+				});
+				return;
+			}
+
 			const json = await response.json();
+
+			console.log(json);
 
 			if (!response.ok) {
 				toast('Error creating todo', {
@@ -62,6 +72,7 @@ export const ToDoCreate = () => {
 
 			form.reset();
 			router.refresh();
+			// revalidatePath('/');
 			toast('Todo created successfuly', {
 				description: parsedData.title,
 			});
@@ -76,7 +87,7 @@ export const ToDoCreate = () => {
 
 	return (
 		<div className='w-full min-w-[320px]'>
-			<Card>
+			<Card className='bg-white/30 border border-fuchsia-100 shadow-md rounded-3xl'>
 				<CardHeader>
 					<h2 className='scroll-m-20 border-b pb-2 text-stone-800 text-2xl font-semibold tracking-tight first:mt-0'>
 						Create Todos

@@ -76,7 +76,7 @@ def hello():
 
 
 @app.post(
-    "/api/auth/signup",
+    "/api/user/signup",
     response_model=UserResponse,
     status_code=status.HTTP_201_CREATED,
 )
@@ -84,11 +84,14 @@ def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = get_user(db, username=user.username)
 
     if db_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
+        raise HTTPException(
+            status_code=400,
+            detail="Username already registered",
+        )
     return create_user(db=db, user=user)
 
 
-@app.post("/api/auth/login", response_model=Token)
+@app.post("/api/user/login", response_model=Token)
 def login(
     user: UserLogin,
     db: Session = Depends(get_db),
@@ -98,9 +101,9 @@ def login(
     """
     db_user = get_user(db, username=user.username)
     if not user:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
     if not verify_password(user.password, db_user.hashed_password):
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
     access_token_expires = timedelta(minutes=30)
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
@@ -112,7 +115,7 @@ def login(
     }
 
 
-@app.get("/api/auth/me", response_model=UserResponse)
+@app.get("/api/user/me", response_model=UserResponse)
 async def read_users_me(
     current_user: UserResponse = Depends(get_current_user),
 ):
@@ -127,8 +130,12 @@ async def read_users_me(
     response_model=TodoResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_all_todo(todo: TodoCreate, db: Session = Depends(get_db)):
-    return create_todo(db=db, todo=todo)
+def create_all_todo(
+    todo: TodoCreate,
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(get_current_user),
+):
+    return create_todo(db=db, todo=todo, owner_id=current_user.id)
 
 
 @app.get(
@@ -141,8 +148,11 @@ def get_all_todos(
     skip: int = 0,
     limit: int = 100,
     completed: bool = False,
+    current_user: UserResponse = Depends(get_current_user),
 ):
-    db_todos = get_todos(db=db, skip=skip, limit=limit, completed=completed)
+    db_todos = get_todos(
+        db=db, skip=skip, limit=limit, completed=completed, owner_id=current_user.id
+    )
 
     if len(db_todos) == 0:
         raise HTTPException(
