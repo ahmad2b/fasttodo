@@ -34,3 +34,23 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+---
+
+1. Deploy your simple next.js project to vercel
+2. Create a api/index.py file in route
+3. Create a simple /api/status GET route
+4. create requirements.txt file and add fastapi package name
+5. deploy it to vercel
+6. visit `your-vercel.app/api/status`
+7. If everything working good you have successfuly deployed fastapi with next.js on vercel
+8. Create config file
+9. add pydantic package to requirements.txt file
+10. create schemas file
+11. create db.py file and used packages to requirements.txt file
+12. create models.py file
+13. use alembic to do migrations etc and add package name to the requirements.txt file
+14. update the alembic env.py file
+15. run alembic revisio .....
+16. update the head to creat todo and users tables
+17.
