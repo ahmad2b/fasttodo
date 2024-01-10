@@ -82,9 +82,6 @@ export async function DELETE(req: NextRequest, { params }: TodoParams) {
 	const cookieStore = cookies();
 	const access_token = cookieStore.get('access_token')?.value;
 
-	console.log('DEL ID', todo_id);
-	console.log('ACCESS TOKEN', access_token);
-
 	if (!access_token) {
 		return NextResponse.json('Unauthorized', {
 			status: 401,
@@ -110,25 +107,21 @@ export async function DELETE(req: NextRequest, { params }: TodoParams) {
 		}
 	);
 
-	console.log('DEL RESPONSE', response.status);
-
 	if (response.status === 401) {
 		return NextResponse.json('Unauthorized', {
 			status: 401,
 		});
 	}
 
-	const json = await response.json();
-
 	if (!response.ok) {
-		return NextResponse.json(json, {
+		return NextResponse.json({
 			status: 400,
 			statusText: 'Bad Request',
 		});
 	}
 	revalidatePath('/');
 
-	return NextResponse.json(json, {
+	return NextResponse.json({
 		status: 204,
 		statusText: 'OK',
 	});

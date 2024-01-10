@@ -32,6 +32,14 @@ export async function POST(req: NextRequest) {
 			status: 401,
 			statusText: 'Unauthorized',
 		});
+	} else if (response.status === 404) {
+		return NextResponse.json(
+			'Incorrect Username! Please check your username or signup.',
+			{
+				status: 404,
+				statusText: 'Not found',
+			}
+		);
 	}
 
 	const data = await response.json();

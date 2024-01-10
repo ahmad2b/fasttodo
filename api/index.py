@@ -67,11 +67,17 @@ def get_settings():
 
 @app.get("/api")
 def read_root(settings: config.Settings = Depends(get_settings)):
+    """
+    Root API endpoint. Returns a greeting message and the application name.
+    """
     return {"Hello": "World", "app_name": settings.app_name}
 
 
 @app.get("/api/status")
 def hello():
+    """
+    Status endpoint. Returns a success status and a greeting message.
+    """
     return {"status": "success", "message": "Hello Friends!"}
 
 
@@ -81,6 +87,9 @@ def hello():
     status_code=status.HTTP_201_CREATED,
 )
 def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
+    """
+    User signup API endpoint. Creates a new user.
+    """
     db_user = get_user(db, username=user.username)
 
     if db_user:
@@ -100,8 +109,11 @@ def login(
     Login route. Returns a JWT token to be used in subsequent requests.
     """
     db_user = get_user(db, username=user.username)
-    if not user:
-        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found. Please check your username and try again.",
+        )
     if not verify_password(user.password, db_user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     access_token_expires = timedelta(minutes=30)
@@ -116,11 +128,11 @@ def login(
 
 
 @app.get("/api/user/me", response_model=UserResponse)
-async def read_users_me(
+async def me(
     current_user: UserResponse = Depends(get_current_user),
 ):
     """
-    Get the login user information.
+    Returns the information of the currently logged in user.
     """
     return current_user
 
@@ -130,11 +142,14 @@ async def read_users_me(
     response_model=TodoResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_all_todo(
+def create__todo(
     todo: TodoCreate,
     db: Session = Depends(get_db),
     current_user: UserResponse = Depends(get_current_user),
 ):
+    """
+    Create todo API endpoint. Creates a new todo.
+    """
     return create_todo(db=db, todo=todo, owner_id=current_user.id)
 
 
@@ -143,13 +158,16 @@ def create_all_todo(
     response_model=List[TodoResponse],
     status_code=status.HTTP_200_OK,
 )
-def get_all_todos(
+def get__todos(
     db: Session = Depends(get_db),
     skip: int = 0,
     limit: int = 100,
     completed: bool = False,
     current_user: UserResponse = Depends(get_current_user),
 ):
+    """
+    Get all todos API endpoint. Returns a list of todos.
+    """
     db_todos = get_todos(
         db=db, skip=skip, limit=limit, completed=completed, owner_id=current_user.id
     )
@@ -166,7 +184,8 @@ def get_all_todos(
     response_model=TodoResponse,
     status_code=status.HTTP_200_OK,
 )
-def get_all_todo(todo_id: int, db: Session = Depends(get_db)):
+def get_todo(todo_id: int, db: Session = Depends(get_db)):
+    """Get todo API endpoint. Returns a specific todo."""
     db_todo = read_todo(db=db, todo_id=todo_id)
     if db_todo is None:
         raise HTTPException(
@@ -180,7 +199,8 @@ def get_all_todo(todo_id: int, db: Session = Depends(get_db)):
     response_model=TodoResponse,
     status_code=status.HTTP_200_OK,
 )
-def update_all_todo(todo_id: int, todo: TodoCreate, db: Session = Depends(get_db)):
+def update__todo(todo_id: int, todo: TodoCreate, db: Session = Depends(get_db)):
+    """Update todo API endpoint. Updates a specific todo."""
     db_todo = update_todo(db=db, todo_id=todo_id, todo=todo)
     if db_todo is None:
         raise HTTPException(
@@ -191,6 +211,7 @@ def update_all_todo(todo_id: int, todo: TodoCreate, db: Session = Depends(get_db
 
 @app.delete("/api/todos/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_all_todo(todo_id: int, db: Session = Depends(get_db)):
+    """Delete todo API endpoint. Deletes a specific todo."""
     db_todo = delete_todo(db=db, todo_id=todo_id)
     if db_todo is None:
         raise HTTPException(

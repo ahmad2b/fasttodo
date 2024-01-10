@@ -9,9 +9,19 @@ const page = () => {
 				defaultValue='login'
 				className='min-w-[320px] w-full max-w-[400px]'
 			>
-				<TabsList className='grid w-full grid-cols-2'>
-					<TabsTrigger value='login'>Login</TabsTrigger>
-					<TabsTrigger value='signup'>Signup</TabsTrigger>
+				<TabsList className='grid w-full grid-cols-2 rounded-2xl bg-opacity-40'>
+					<TabsTrigger
+						className='rounded-3xl bg-opacity-40'
+						value='login'
+					>
+						Login
+					</TabsTrigger>
+					<TabsTrigger
+						className='rounded-3xl '
+						value='signup'
+					>
+						Signup
+					</TabsTrigger>
 				</TabsList>
 				<TabsContent value='login'>
 					<LoginForm />

@@ -12,7 +12,7 @@ const Navbar = () => {
 
 	return (
 		<Nav>
-			<ul className='block lg:flex lg:space-x-4 space-y-2 lg:space-y-0'>
+			<ul className='block lg:flex lg:space-x-4 space-y-2 lg:space-y-0 px-2 py-1 h-11'>
 				<li>
 					<Link
 						href={'/'}
@@ -20,7 +20,7 @@ const Navbar = () => {
 							buttonVariants({
 								variant: 'outline',
 								className:
-									'flex py-2 text-base text-fuchsia-950 hover:text-fuchsia-900 hover:bg-fuchsia-950/10 font-medium space-x-2 px-6',
+									'flex py-2 h-9 text-base text-fuchsia-950 hover:text-fuchsia-900 hover:bg-fuchsia-950/10 font-medium space-x-2 px-6',
 							})
 						)}
 					>
@@ -36,7 +36,7 @@ const Navbar = () => {
 							buttonVariants({
 								variant: 'outline',
 								className:
-									'flex py-2 text-base text-fuchsia-950 hover:text-fuchsia-900 hover:bg-fuchsia-950/10 font-medium space-x-2 px-6',
+									'flex py-2 h-9 text-base text-fuchsia-950 hover:text-fuchsia-900 hover:bg-fuchsia-950/10 font-medium space-x-2 px-6',
 							})
 						)}
 					>

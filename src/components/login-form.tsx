@@ -53,7 +53,11 @@ export const LoginForm = () => {
 			body: JSON.stringify(parsedData),
 		});
 
-		if (response.status === 401 || response.status === 400) {
+		if (
+			response.status === 401 ||
+			response.status === 400 ||
+			response.status === 404
+		) {
 			toast('Error Loggin in', {
 				description: 'Invalid username or password',
 			});
@@ -74,7 +78,7 @@ export const LoginForm = () => {
 
 	return (
 		<div>
-			<Card>
+			<Card className='bg-opacity-40 rounded-2xl'>
 				<CardHeader>
 					<CardTitle>Login</CardTitle>
 					<CardDescription>

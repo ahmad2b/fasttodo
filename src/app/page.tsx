@@ -6,10 +6,10 @@ export default function Home() {
 		<div className='flex flex-col items-center py-6 max-w-7xl mx-auto space-y-8 md:space-y-12'>
 			<div className='flex flex-col items-center'>
 				<h1 className='scroll-m-10 text-3xl font-extrabold tracking-tight md:text-4xl  lg:text-5xl text-stone-800'>
-					Welcome to Next Fast ToDo
+					Welcome to Fast Todo
 				</h1>
 				<p className='leading-7 mt-4 text-lg text-stone-700'>
-					An app to help you keep track of your tasks.
+					Create your todo&apos;s and let&apos;s karate chop your tasks. 🥋
 				</p>
 			</div>
 

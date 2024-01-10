@@ -91,7 +91,7 @@ export const SignupForm = () => {
 
 	return (
 		<div>
-			<Card>
+			<Card className='bg-opacity-40 rounded-2xl'>
 				<CardHeader>
 					<CardTitle>Signup</CardTitle>
 					<CardDescription>
