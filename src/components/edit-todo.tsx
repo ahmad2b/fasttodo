@@ -95,7 +95,7 @@ export const EditTodo = ({ row }: { row: Row<Todo> }) => {
 					variant={'ghost'}
 					size={'icon'}
 					type='button'
-					className='hover:text-blue-500'
+					className='hover:text-blue-500 hover:bg-blue-50'
 				>
 					<Pen className='h-4 w-4 ' />
 				</Button>

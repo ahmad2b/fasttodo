@@ -73,7 +73,7 @@ const CompleteButton = ({ row }: { row: Row<Todo> }) => {
 			variant={'ghost'}
 			size={'icon'}
 			onClick={handleClick}
-			className='hover:text-green-700'
+			className='hover:text-green-700 hover:bg-green-50'
 			type='button'
 		>
 			{row.original.completed ? (
@@ -114,7 +114,7 @@ const Delete = ({ row }: { row: Row<Todo> }) => {
 			variant={'ghost'}
 			size={'icon'}
 			onClick={handleDelete}
-			className='hover:text-red-700'
+			className='hover:text-red-700 hover:bg-red-50'
 			type='button'
 		>
 			<Trash className='h-4 w-4 ' />

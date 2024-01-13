@@ -52,6 +52,8 @@ export const ToDoCreate = () => {
 				body: JSON.stringify(parsedData),
 			});
 
+			console.log(response.status);
+
 			if (response.status === 401) {
 				toast('Please login or create account to create todos', {
 					description: 'Unauthorized',

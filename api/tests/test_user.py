@@ -25,7 +25,7 @@ def test_create_user():
     response = client.post("/api/v1/users/", json=user_data)
 
     # Act
-    db: Session = next(get_db())
+    # db: Session = next(get_db())
     user = get_user(db, user_data["username"])
 
     # Assert

@@ -45,9 +45,11 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
 	const body = await req.json();
 	const cookieStore = cookies();
-	const access_token = cookieStore.get('access_token');
+	const access_token = cookieStore.get('access_token')?.value;
 
-	if (!access_token?.value) {
+	console.log(access_token);
+
+	if (!access_token) {
 		return NextResponse.json('Unauthorized', {
 			status: 401,
 		});
@@ -63,11 +65,13 @@ export async function POST(req: NextRequest) {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: 'Bearer ' + access_token.value || '',
+			Authorization: 'Bearer ' + access_token,
 		},
 		body: JSON.stringify(parsedData),
 		cache: 'no-store',
 	});
+
+	console.log(response.status);
 
 	if (response.status === 401) {
 		return NextResponse.json({

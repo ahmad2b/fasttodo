@@ -20,9 +20,6 @@ async function getData(): Promise<Todo[]> {
 	const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/todos`, {
 		cache: 'no-store',
 		headers,
-		next: {
-			revalidate: 1,
-		},
 	});
 
 	if (!response.ok) {
