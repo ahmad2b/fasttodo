@@ -1,9 +1,8 @@
 from sqlalchemy.orm import Session
 from typing import Optional
 
-from ..models.models import Todo, User
-from ..schemas.schemas import TodoCreate, UserCreate
-from ..lib import auth
+from ..database.models.todo import Todo
+from ..schemas.todo import TodoCreate
 
 
 def create_todo(db: Session, todo: TodoCreate, owner_id: int):
@@ -47,23 +46,25 @@ def get_todos(
             .all()
         )
 
-    # if completed:
-    #     return (
-    #         db.query(Todo)
-    #         .filter(Todo.completed == completed)
-    #         .offset(skip)
-    #         .limit(limit)
-    #         .all()
-    #     )
-    # return db.query(Todo).offset(skip).limit(limit).all()
+
+def read_todo(db: Session, todo_id: int, owner_id: int):
+    # return db.query(Todo).filter(Todo.id == todo_id).first()
+    return (
+        db.query(Todo)
+        .filter(Todo.id == todo_id)
+        .filter(Todo.owner_id == owner_id)
+        .first()
+    )
 
 
-def read_todo(db: Session, todo_id: int):
-    return db.query(Todo).filter(Todo.id == todo_id).first()
-
-
-def update_todo(db: Session, todo_id: int, todo: TodoCreate):
-    db_todo = db.query(Todo).filter(Todo.id == todo_id).first()
+def update_todo(db: Session, todo_id: int, todo: TodoCreate, owner_id: int):
+    # db_todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    db_todo = (
+        db.query(Todo)
+        .filter(Todo.id == todo_id)
+        .filter(Todo.owner_id == owner_id)
+        .first()
+    )
     if db_todo is None:
         return None
     db.query(Todo).filter(Todo.id == todo_id).update(
@@ -78,26 +79,16 @@ def update_todo(db: Session, todo_id: int, todo: TodoCreate):
     return db_todo
 
 
-def delete_todo(db: Session, todo_id: int):
+def delete_todo(db: Session, todo_id: int, owner_id: int):
+    db_todo = (
+        db.query(Todo)
+        .filter(Todo.id == todo_id)
+        .filter(Todo.owner_id == owner_id)
+        .first()
+    )
+
+    if db_todo is None:
+        return None
     db.query(Todo).filter(Todo.id == todo_id).delete()
     db.commit()
-    return True
-
-
-def create_user(db: Session, user: UserCreate):
-    hashed_password = auth.get_password_hash(user.password)
-    db_user = User(
-        username=user.username, email=user.email, hashed_password=hashed_password
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
-
-
-def get_user(db: Session, username: str):
-    return db.query(User).filter(User.username == username).first()
-
-
-def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+    return db_todo

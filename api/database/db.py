@@ -1,12 +1,14 @@
-import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from dotenv import load_dotenv
+from sqlalchemy.pool import QueuePool
+from ..config.config import settings
 
-load_dotenv()
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{os.environ['DATABASE_USERNAME']}:{os.environ['DATABASE_PASSWORD']}@{os.environ['DATABASE_HOST']}/{os.environ['DATABASE_NAME']}?sslmode=require"
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SQLALCHEMY_DATABASE_URL = settings.database_url
+# engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, poolclass=QueuePool, pool_size=10, max_overflow=20
+)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
