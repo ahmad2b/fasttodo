@@ -9,16 +9,23 @@ import { logout } from './action';
 const Navbar = () => {
 	const cookieStore = cookies();
 	const token = cookieStore.get('access_token')?.value;
+	const username = cookieStore.get('username')?.value;
 
 	return (
 		<Nav>
-			<ul className='block lg:flex lg:space-x-4 space-y-2 lg:space-y-0 px-2 py-1 h-11'>
+			<ul className='block lg:flex lg:space-x-4 items-center space-y-2 lg:space-y-0 px-2 py-1 h-11'>
+				<li className={cn(username ? 'block' : 'hidden')}>
+					<p className='text-balance text-lg text-fuchsia-950 font-medium'>
+						Welcome {username}! -
+					</p>
+				</li>
+
 				<li>
 					<Link
 						href={'/'}
 						className={cn(
 							buttonVariants({
-								variant: 'outline',
+								variant: token ? 'ghost' : 'outline',
 								className:
 									'flex py-2 h-9 text-base text-fuchsia-950 hover:text-fuchsia-900 hover:bg-fuchsia-950/10 font-medium space-x-2 px-6',
 							})
@@ -50,7 +57,7 @@ const Navbar = () => {
 							// href={'/'}
 							className={cn(
 								buttonVariants({
-									variant: 'outline',
+									variant: 'ghost',
 									className:
 										'flex py-2 w-full text-base text-fuchsia-950 hover:text-fuchsia-900 hover:bg-fuchsia-950/10 font-medium space-x-2 px-6',
 								})

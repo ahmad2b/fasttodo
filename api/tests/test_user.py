@@ -66,6 +66,25 @@ def test_create_user_duplicate_username():
     assert response.status_code == 409  # Bad Request
 
 
+def test_create_user_duplicate_email():
+    """
+    This test checks what happens when you try to create a user with an email address that already exists.
+    """
+    # Arrange
+    user_data = {
+        "username": "testuser5",
+        "email": "testuser5@example.com",
+        "password": "XXXXXXXXXXXX",
+    }
+
+    # Act
+    # client.post("/api/v1/users/", json=user_data)
+    response = client.post("/api/v1/users/", json=user_data)
+
+    # Assert
+    assert response.status_code == 409  # Bad Request
+
+
 # Test edge case: empty username
 def test_create_user_empty_username():
     """

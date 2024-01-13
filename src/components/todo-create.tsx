@@ -18,7 +18,6 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { useState } from 'react';
-import { revalidatePath } from 'next/cache';
 
 export const TodoValidator = z.object({
 	title: z.string().min(1).max(100),

@@ -1,4 +1,4 @@
-import { Todo } from '@/types/todo';
+import { Todo } from '@/lib/type';
 import { columns } from './columns';
 import { DataTable } from './data-table';
 import { cookies } from 'next/headers';

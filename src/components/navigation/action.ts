@@ -8,4 +8,7 @@ export async function logout(formData: FormData) {
 	console.log(formData.get('access_token'));
 
 	cookieStore.delete('access_token');
+	cookieStore.delete('refresh_token');
+	cookieStore.delete('username');
+	cookieStore.delete('token_type');
 }

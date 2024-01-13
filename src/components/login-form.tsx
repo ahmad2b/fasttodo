@@ -1,8 +1,14 @@
 'use client';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
+
+import { login } from '@/app/actions/auth';
+
+import { LoginValidator, LoginRequest } from '@/lib/validators';
+
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
 	Card,
 	CardContent,
@@ -10,7 +16,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import {
 	Form,
 	FormControl,
@@ -19,61 +24,57 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
-import { toast } from 'sonner';
 
-const formSchema = z.object({
-	username: z.string().min(3),
-	password: z.string().min(3),
-});
-
-type FormData = z.infer<typeof formSchema>;
+const hardRedirect = () => {
+	window.location.reload();
+	window.location.href = '/';
+};
 
 export const LoginForm = () => {
-	const form = useForm<FormData>({
-		resolver: zodResolver(formSchema),
+	const form = useForm<LoginRequest>({
+		resolver: zodResolver(LoginValidator),
 		defaultValues: {
 			username: '',
 			password: '',
 		},
 	});
 
-	const hardRedirect = () => {
-		window.location.reload();
-		window.location.href = '/';
-	};
+	const onSubmit = async (data: LoginRequest) => {
+		const parsedData = LoginValidator.parse(data);
 
-	const onSubmit = async (data: FormData) => {
-		const parsedData = formSchema.parse(data);
-
-		const response = await fetch(`/fast/login`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(parsedData),
-		});
-
-		if (
-			response.status === 401 ||
-			response.status === 400 ||
-			response.status === 404
-		) {
+		if (!parsedData.username || !parsedData.password) {
 			toast('Error Loggin in', {
-				description: 'Invalid username or password',
-			});
-			return;
-		} else if (!response.ok) {
-			toast('Error Loggin in', {
-				description: 'Something went wrong',
+				description: 'Username or password cannot be empty',
 			});
 			return;
 		}
 
-		toast('Login successfully', {
-			description: `Welcome back ${parsedData.username}`,
+		let formData = new FormData();
+
+		Object.entries(parsedData).forEach(([key, value]) => {
+			formData.append(key, value);
 		});
-		form.reset();
-		hardRedirect();
+
+		const action_res = await login(formData);
+
+		if (action_res.error) {
+			toast('Login failed', {
+				description: action_res.error,
+			});
+			return;
+		} else if (action_res.data) {
+			toast('Login Successful', {
+				description: `Welcome back ${action_res.data.username}`,
+			});
+			form.reset();
+			hardRedirect();
+			return;
+		} else {
+			toast('Login failed', {
+				description: 'Something went wrong',
+			});
+			return;
+		}
 	};
 
 	return (

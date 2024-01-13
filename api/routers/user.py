@@ -4,7 +4,7 @@ from loguru import logger
 from datetime import timedelta
 from dotenv import load_dotenv
 
-from ..services.user import create_user, get_user
+from ..services.user import create_user, get_user, get_user_by_email
 from ..database.db import get_db
 from ..schemas.user import UserCreate, UserResponse, UserLogin
 from ..schemas.token import Token, TokenRefresh
@@ -39,6 +39,16 @@ def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
             detail="Username already registered",
         )
         # create new user
+
+    db_email = get_user_by_email(db, email=user.email)
+    if db_email:
+        logger.warning("Email already registered")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already registered",
+        )
+        # create new user
+
     new_user = create_user(db=db, user=user)
     return UserResponse(
         id=new_user.id,

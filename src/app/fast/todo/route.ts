@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TodoRequest } from '@/types/todo';
+import { TodoRequest } from '@/lib/type';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { TodoValidator } from '@/components/todo-create';

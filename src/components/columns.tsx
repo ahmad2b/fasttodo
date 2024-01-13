@@ -1,6 +1,6 @@
 'use client';
 
-import { Todo } from '@/types/todo';
+import { Todo } from '@/lib/type';
 import { ColumnDef, Row } from '@tanstack/react-table';
 import { CheckSquare2, Square, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';

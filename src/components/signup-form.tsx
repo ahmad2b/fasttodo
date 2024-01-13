@@ -1,8 +1,15 @@
 'use client';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
+
+import { signup } from '@/app/actions/auth';
+
+import { SignupRequest, SignupValidator } from '@/lib/validators';
+
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
 	Card,
 	CardContent,
@@ -10,7 +17,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import {
 	Form,
 	FormControl,
@@ -19,33 +25,22 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
-import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
-
-const formSchema = z.object({
-	username: z.string().min(3),
-	password: z.string().min(6),
-	confirmPassword: z.string().min(6),
-	email: z.string().email(),
-});
-
-type FormData = z.infer<typeof formSchema>;
 
 export const SignupForm = () => {
 	const router = useRouter();
 
-	const form = useForm<FormData>({
-		resolver: zodResolver(formSchema),
+	const form = useForm<SignupRequest>({
+		resolver: zodResolver(SignupValidator),
 		defaultValues: {
 			username: '',
+			email: '',
 			password: '',
 			confirmPassword: '',
-			email: '',
 		},
 	});
 
-	const onSubmit = async (data: FormData) => {
-		const parsedData = formSchema.parse(data);
+	const onSubmit = async (data: SignupRequest) => {
+		const parsedData = SignupValidator.parse(data);
 
 		if (parsedData.password !== parsedData.confirmPassword) {
 			toast('Error Signing up', {
@@ -54,39 +49,38 @@ export const SignupForm = () => {
 			return;
 		}
 
-		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_API_URL}/user/signup`,
-			{
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					username: parsedData.username,
-					email: parsedData.email,
-					password: parsedData.password,
-				}),
-			}
-		);
+		let formData = new FormData();
 
-		if (response.status === 400) {
+		Object.entries(parsedData).forEach(([key, value]) => {
+			formData.append(key, value);
+		});
+
+		const action_res = await signup(formData);
+
+		if (action_res.error) {
 			toast('Signup Failed', {
-				description: `${parsedData.username} or ${parsedData.email} already registered`,
+				description: action_res.error,
 			});
-
 			return;
-		} else if (!response.ok) {
+		} else if (action_res.data) {
+			toast('Success!', {
+				description: 'You have successfully signed up! Please login.',
+				action: {
+					label: 'Login',
+					onClick: () => {
+						router.push('/login');
+					},
+				},
+			});
+			form.reset();
+			router.refresh();
+			return;
+		} else {
 			toast('Signup Failed', {
 				description: 'Something went wrong',
 			});
 			return;
 		}
-
-		toast('Success!', {
-			description: 'You have successfully signed up! Please login.',
-		});
-		form.reset();
-		router.refresh();
 	};
 
 	return (
