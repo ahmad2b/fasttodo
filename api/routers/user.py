@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from loguru import logger
 from datetime import timedelta
+from dotenv import load_dotenv
 
 from ..services.user import create_user, get_user
 from ..database.db import get_db
@@ -18,8 +19,8 @@ from ..utils.auth import (
 
 router = APIRouter(tags=["User"])
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 1
-REFRESH_TOKEN_EXPIRE_MINUTES = 5
+ACCESS_TOKEN_EXPIRE_MINUTES = 5
+REFRESH_TOKEN_EXPIRE_MINUTES = 10
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserResponse)

@@ -9,8 +9,8 @@ load_dotenv()
 
 SECRET_KEY: str = os.getenv("SECRET_KEY") or "secret"
 ALGORITHM: str = os.getenv("ALGORITHM") or "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 1
-REFRESH_TOKEN_EXPIRE_MINUTES = 5
+ACCESS_TOKEN_EXPIRE_MINUTES = 5
+REFRESH_TOKEN_EXPIRE_MINUTES = 10
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
