@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 import sys
 
+sys.path.append(r"C:\Users\ahmad\Desktop\BattleField\fasttodo")
 
 from api.index import app
 from api.services.user import get_user, create_user
