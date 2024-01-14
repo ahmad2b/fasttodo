@@ -7,20 +7,20 @@ import Link from 'next/link';
 async function getData(): Promise<Todo[]> {
 	const cookieStore = cookies();
 	const token = cookieStore.get('access_token')?.value;
-
+	console.log('ACCESS_TOKEN', token);
 	if (!token) {
 		return [];
 	}
 
-	const headers = {
-		Authorization: `Bearer ${token}`,
-		'Content-Type': 'application/json',
-	};
-
 	const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/todos`, {
 		cache: 'no-store',
-		headers,
+		headers: {
+			Authorization: `Bearer ${token}`,
+			'Content-Type': 'application/json',
+		},
 	});
+
+	console.log('Get TODOS: ' + response.status);
 
 	if (!response.ok) {
 		return [];

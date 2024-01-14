@@ -3,11 +3,10 @@ from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 import sys
 
-sys.path.append(r"C:\Users\ahmad\Desktop\BattleField\fasttodo")
 
 from api.index import app
 from api.services.user import get_user, create_user
-from api.database.db import get_db
+from api._database.db import get_db
 
 client = TestClient(app)
 
@@ -18,20 +17,21 @@ def test_create_user():
     """
     # Arrange
     user_data = {
-        "username": "testuser12",
-        "email": "testuser12@example.com",
+        "username": "pytestuser1",
+        "email": "pytestuser1@example.com",
         "password": "testpassword",
     }
     response = client.post("/api/v1/users/", json=user_data)
 
     # Act
-    # db: Session = next(get_db())
+    db: Session = next(get_db())
+
     user = get_user(db, user_data["username"])
 
     # Assert
     assert response.status_code == 201
     assert isinstance(response.json(), dict)
-    assert response.json()["username"] == user_data["username"]
+    assert response.json()["username"] == user.username
 
 
 def test_create_user_missing_data():
@@ -46,7 +46,7 @@ def test_create_user_missing_data():
     response = client.post("/api/v1/users/", json=user_data)
 
     # Assert
-    assert response.status_code == 422  # Unprocessable Entity
+    assert response.status_code == 422
 
 
 def test_create_user_duplicate_username():
@@ -74,7 +74,7 @@ def test_create_user_duplicate_email():
     user_data = {
         "username": "testuser5",
         "email": "testuser5@example.com",
-        "password": "XXXXXXXXXXXX",
+        "password": "testpassword",
     }
 
     # Act

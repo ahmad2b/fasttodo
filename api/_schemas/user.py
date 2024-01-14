@@ -2,7 +2,7 @@ from typing_extensions import Annotated
 from pydantic import BaseModel, EmailStr, StringConstraints
 from typing import Optional, List
 from datetime import datetime
-from ..schemas.todo import TodoResponse
+from .._schemas.todo import TodoResponse
 
 
 class UserCreate(BaseModel):

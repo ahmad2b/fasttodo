@@ -20,6 +20,8 @@ export async function middleware(request: NextRequest) {
 	}
 
 	if (refresh_token && !access_token) {
+		console.log('MIDDLE WARE REFRESH TOKEN', refresh_token);
+
 		const response = await fetch(
 			`${process.env.NEXT_PUBLIC_API_URL}/users/token/refresh`,
 			{
@@ -31,7 +33,14 @@ export async function middleware(request: NextRequest) {
 			}
 		);
 
+		console.log('MIDDLE WARE RESPONSE', response.status);
+
 		if (response.status === 401) {
+			cookiesStore.delete('access_token');
+			cookiesStore.delete('refresh_token');
+			cookiesStore.delete('username');
+			cookiesStore.delete('token_type');
+
 			return NextResponse.redirect(`${request.url}/login `);
 		}
 
@@ -61,5 +70,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-	matcher: ['/api/v1/:path*', '/login', '/'],
+	matcher: ['/login', '/'],
 };

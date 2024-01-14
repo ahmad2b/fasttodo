@@ -13,7 +13,7 @@ from api.services.todo import (
     delete_todo,
     update_todo,
 )
-from api.database.db import get_db
+from api._database.db import get_db
 
 client = TestClient(app)
 

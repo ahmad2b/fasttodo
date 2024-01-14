@@ -1,14 +1,15 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
-from loguru import logger
+
+# from loguru import logger
 from datetime import timedelta
 from dotenv import load_dotenv
 
 from ..services.user import create_user, get_user, get_user_by_email
-from ..database.db import get_db
-from ..schemas.user import UserCreate, UserResponse, UserLogin
-from ..schemas.token import Token, TokenRefresh
-from ..utils.auth import (
+from .._database.db import get_db
+from .._schemas.user import UserCreate, UserResponse, UserLogin
+from .._schemas.token import Token, TokenRefresh
+from .._utils.auth import (
     get_current_user,
     verify_password,
     create_access_token,
@@ -28,12 +29,12 @@ def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
     """
     Create user API endpoint. Creates a new user.
     """
-    logger.info("Creating a new user")
+    # logger.info("Creating a new user")
 
     # try:
     db_user = get_user(db, username=user.username)
     if db_user:
-        logger.warning("Username already registered")
+        # logger.warning("Username already registered")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Username already registered",
@@ -42,7 +43,7 @@ def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
 
     db_email = get_user_by_email(db, email=user.email)
     if db_email:
-        logger.warning("Email already registered")
+        # logger.warning("Email already registered")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Email already registered",
@@ -59,7 +60,7 @@ def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
         updated_at=new_user.updated_at,
     )
     # except Exception as e:
-    #     logger.error(f"Error creating user: {e}", exc_info=True)
+    # logger.error(f"Error creating user: {e}", exc_info=True)
     #     raise HTTPException(status_code=500, detail="Internal server error")
 
 
@@ -69,19 +70,19 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
     Login route. Returns a JWT token to be used in subsequent requests.
     """
 
-    logger.info("Logging in user")
+    # logger.info("Logging in user")
 
     db_user = get_user(db, username=user.username)
 
     if not db_user:
-        logger.error("User not found.")
+        # logger.error("User not found.")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found.",
         )
 
     if not verify_password(user.password, db_user.hashed_password):
-        logger.error("Incorrect password")
+        # logger.error("Incorrect password")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect password",
@@ -94,7 +95,7 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
     refresh_token = create_refresh_token(
         data={"sub": user.username}, expires_delta=refresh_token_expires
     )
-    logger.info("User logged in successfully")
+    # logger.info("User logged in successfully")
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
@@ -110,13 +111,13 @@ def get_loggedin_user(
     """
     Returns the information of the currently logged in user.
     """
-    logger.info("Fetching current user information")
+    # logger.info("Fetching current user information")
     return current_user
 
 
 @router.post("/token/refresh", response_model=Token)
 def refresh_token(token_refresh: TokenRefresh, db: Session = Depends(get_db)):
-    logger.info("Refreshing token")
+    # logger.info("Refreshing token")
     refresh_token = token_refresh.refresh_token
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

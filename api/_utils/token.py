@@ -3,11 +3,11 @@ from dotenv import load_dotenv
 from typing import Optional
 from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
-from ..schemas.token import TokenData
+from .._schemas.token import TokenData
 
 load_dotenv()
 
-SECRET_KEY: str = os.getenv("SECRET_KEY") or "secret"
+SECRET_KEY: str = os.getenv("SECRET_KEY") or "VT3BlbkFJmqaji32ruwrd43jmhb3s"
 ALGORITHM: str = os.getenv("ALGORITHM") or "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 5
 REFRESH_TOKEN_EXPIRE_MINUTES = 10

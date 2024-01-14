@@ -3,9 +3,9 @@ from typing import Optional
 from sqlalchemy.exc import SQLAlchemyError
 
 
-from ..database.models.user import User
-from ..schemas.user import UserCreate
-from ..utils.hash_password import HashPassword
+from .._database.models.user import User
+from .._schemas.user import UserCreate
+from .._utils.hash_password import HashPassword
 
 create_pass_hash = HashPassword().create_pass
 

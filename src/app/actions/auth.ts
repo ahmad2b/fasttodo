@@ -70,11 +70,13 @@ export async function login(formData: FormData): Promise<LoginResponse> {
 		headers: {
 			'Content-Type': 'application/json',
 		},
+		cache: 'no-store',
 		body: JSON.stringify({ username, password }),
 	});
 	console.log('LOGIN ACTION RES', res.status);
 
 	const data = await res.json();
+
 	console.log('LOGIN ACTION DATA', data);
 
 	if (res.status === 401)

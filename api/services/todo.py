@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from typing import Optional
 
-from ..database.models.todo import Todo
-from ..schemas.todo import TodoCreate
+from .._database.models.todo import Todo
+from .._schemas.todo import TodoCreate
 
 
 def create_todo(db: Session, todo: TodoCreate, owner_id: int):
